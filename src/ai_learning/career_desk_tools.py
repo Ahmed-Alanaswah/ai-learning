@@ -1,3 +1,10 @@
+from openai import (
+    OpenAI,
+    APITimeoutError,
+    APIConnectionError,
+    RateLimitError,
+    APIStatusError,
+)
 import json
 import os
 from pathlib import Path
@@ -8,7 +15,29 @@ from pydantic import BaseModel
 
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
-client = OpenAI()
+client = OpenAI(
+    timeout=15.0,
+    max_retries=1,
+)
+
+
+def call_ai(**kwargs):
+    try:
+        return client.responses.create(**kwargs)
+
+    except APITimeoutError:
+        print("AI request timed out.")
+
+    except APIConnectionError:
+        print("Cannot connect to AI provider.")
+
+    except RateLimitError:
+        print("Rate limit reached. Try again later.")
+
+    except APIStatusError as error:
+        print(f"AI API error: {error.status_code}")
+
+    raise SystemExit(1)
 
 
 # Mock database
@@ -112,7 +141,7 @@ messages = [
     }
 ]
 
-response = client.responses.create(
+response = call_ai(
     model=model,
     instructions=(
         "Use search_jobs for job searches. "
@@ -146,7 +175,7 @@ for item in response.output:
     })
 
 
-final_response = client.responses.create(
+final_response = call_ai(
     model=model,
     instructions=(
         "Answer in Arabic using only the tool results. "
