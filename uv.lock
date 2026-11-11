@@ -20,6 +20,7 @@ source = { editable = "." }
 dependencies = [
     { name = "gradio" },
     { name = "openai" },
+    { name = "pydantic" },
     { name = "python-dotenv" },
 ]
 
@@ -27,6 +28,7 @@ dependencies = [
 requires-dist = [
     { name = "gradio", specifier = ">=6.31.0" },
     { name = "openai", specifier = ">=3.42.1" },
+    { name = "pydantic", specifier = ">=2.14.2" },
     { name = "python-dotenv", specifier = ">=1.2.4" },
 ]
 
